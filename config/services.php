@@ -4,7 +4,8 @@ return [
 
     'anthropic' => [
         'key' => env('ANTHROPIC_API_KEY'),
-        'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-5-20250929'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-5-5'),
+        'version' => env('ANTHROPIC_API_VERSION', '2026-10-21'),
     ],
 
     'jarvis' => [

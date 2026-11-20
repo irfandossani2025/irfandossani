@@ -9,7 +9,7 @@ A responsive Laravel portfolio for marketing, branding, digital experience and b
 - Project category filters, a responsive mobile menu, a guided challenge selector, and a motion control for visitors.
 - A full-body cartoon avatar that begins as a chain-hung, flickable charm, then drops into a four-frame walk cycle, answers a ringing phone, messages, slides in a laptop workstation, thinks and dances. Visitors can choose actions or pause the companion from its glass-style controls; the motion follows reduced-motion settings.
 - Cinematic CSS motion: staggered title entrances, orbiting graphics, an animated project marquee, reactive hover states, portrait parallax, and scroll reveals. Motion follows the visitor's reduced-motion setting.
-- Irfan 2.0 assistant with optional Anthropic replies and a consent-based project-note handoff.
+- Irfan 2.0 assistant with Claude replies limited to the verified portfolio and related business challenges, plus a consent-based project-note handoff.
 - Optimized WebP portrait and project visuals.
 
 ## Runtime
@@ -39,7 +39,7 @@ Do not upload a local .env file or put service credentials in GitHub. The safe s
 
 ### Irfan 2.0 replies
 
-The assistant works without a key and will direct visitors to email. To enable generated replies, add ANTHROPIC_API_KEY in Plesk's environment settings. Visitor questions are sent to Anthropic to prepare a response; the page tells visitors not to include confidential or sensitive details. Never put the key in source control.
+The assistant works without a key and will direct visitors to email. To enable Claude replies, add `ANTHROPIC_API_KEY` in Plesk's Laravel environment settings and use `ANTHROPIC_MODEL=claude-sonnet-5-5` with `ANTHROPIC_API_VERSION=2026-10-21`. Clear Laravel's cached configuration after changing environment values. Visitor questions are sent to Anthropic with verified portfolio facts; the assistant redirects unrelated questions and the page tells visitors not to include confidential or sensitive details. Never put the key in source control or chat.
 
 ### Project-note email
 
