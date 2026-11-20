@@ -10,14 +10,14 @@
     <meta property="og:title" content="@yield('title', 'Irfan Dossani — Marketing, Branding & Digital Experiences')">
     <meta property="og:description" content="@yield('description', config('portfolio.experience_summary'))">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ asset('images/irfan-portrait.webp') }}">
+    <meta property="og:image" content="{{ asset('images/irfan-avatar-cartoon.webp') }}">
     <link rel="canonical" href="{{ url()->current() }}">
     <script>document.documentElement.classList.add('js');</script>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v=2.2.2">
+    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v=2.3.1">
     @yield('head')
     <title>@yield('title', 'Irfan Dossani — Marketing, Branding & Digital Experiences')</title>
 </head>

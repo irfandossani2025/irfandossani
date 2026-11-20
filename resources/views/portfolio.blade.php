@@ -59,7 +59,7 @@
             <div class="hero-orbit hero-orbit--one" aria-hidden="true"><i></i></div>
             <div class="hero-orbit hero-orbit--two" aria-hidden="true"><i></i></div>
             <div class="hero-portrait" data-parallax-card>
-                <img src="{{ asset('images/irfan-portrait.webp') }}" alt="Irfan Dossani in a dark suit" width="1000" height="1500" fetchpriority="high">
+                <img src="{{ asset('images/irfan-avatar-cartoon.webp') }}" alt="Cartoon avatar of Irfan Dossani wearing a black polo, blue jeans and black walking shoes" width="1024" height="1536" fetchpriority="high">
                 <span class="hero-portrait__shine" aria-hidden="true"></span>
                 <span class="hero-portrait__frame" aria-hidden="true"></span>
             </div>
