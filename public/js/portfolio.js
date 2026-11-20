@@ -297,17 +297,27 @@ const avatarCompanion = document.querySelector('[data-avatar-companion]');
 if (avatarCompanion) {
     const avatarActor = avatarCompanion.querySelector('[data-avatar-actor]');
     const avatarToggle = avatarCompanion.querySelector('[data-avatar-toggle]');
+    const avatarCharm = avatarCompanion.querySelector('[data-avatar-charm]');
+    const avatarCharmRig = avatarCompanion.querySelector('[data-avatar-charm-rig]');
+    const avatarCharmChain = avatarCompanion.querySelector('.avatar-companion__chain');
+    const avatarPendant = avatarCompanion.querySelector('[data-avatar-pendant]');
+    const avatarMenuToggle = avatarCompanion.querySelector('[data-avatar-menu-toggle]');
+    const avatarMenu = avatarCompanion.querySelector('[data-avatar-menu]');
     const avatarCaption = avatarCompanion.querySelector('[data-avatar-caption]');
     const avatarIcon = avatarCompanion.querySelector('[data-avatar-icon]');
     const avatarControlIcon = avatarCompanion.querySelector('[data-avatar-control-icon]');
     const avatarImages = [...avatarCompanion.querySelectorAll('[data-avatar-image]')];
+    const avatarActionButtons = [...avatarCompanion.querySelectorAll('[data-avatar-action]')];
     const avatarHero = document.querySelector('.hero-section');
     const avatarPhases = [
-        { pose: 'walk', caption: 'On the move', icon: '↗', duration: 7800 },
-        { pose: 'think', caption: 'Thinking it through', icon: '✦', duration: 4100 },
-        { pose: 'phone', caption: 'Taking a call', icon: '☎', duration: 4300 },
-        { pose: 'message', caption: 'Sending a note', icon: '✉', duration: 4100 },
-        { pose: 'dance', caption: 'Dance break', icon: '♪', duration: 4600 },
+        { pose: 'walk', action: 'walk', caption: 'On the move', icon: '↔', duration: 8200 },
+        { pose: 'think', action: 'think', caption: 'Thinking it through', icon: '✦', duration: 4200 },
+        { pose: 'ring', imagePose: 'idle', action: 'call', caption: 'Phone ringing…', icon: '☎', duration: 1600 },
+        { pose: 'phone-reach', action: 'call', caption: 'Pulling my phone out', icon: '☎', duration: 1500 },
+        { pose: 'phone', action: 'call', caption: 'Taking a call', icon: '☎', duration: 3900 },
+        { pose: 'message', action: 'message', caption: 'Sending a note', icon: '✉', duration: 3900 },
+        { pose: 'work', action: 'work', caption: 'Setting up to work', icon: '⌨', duration: 6800, move: 'workstation' },
+        { pose: 'dance', action: 'dance', caption: 'Dance break', icon: '♪', duration: 4500 },
     ];
     let avatarPhaseIndex = -1;
     let avatarDirection = 1;
@@ -319,10 +329,78 @@ if (avatarCompanion) {
     let avatarRunning = false;
     let avatarManuallyPaused = false;
     let avatarPastHero = !avatarHero || avatarHero.getBoundingClientRect().bottom <= 0;
+    let avatarArrivalAnimation = null;
+    let avatarArrivalTimer = null;
+    let charmAngle = 0;
+    let charmAngularVelocity = 0;
+    let charmFrame = null;
+    let charmLastFrame = 0;
+    let charmDragging = false;
+    let charmDragMoved = false;
+    let charmLastPointerAngle = 0;
+    let charmLastPointerTime = 0;
+    let charmStartX = 0;
+    let charmStartY = 0;
+    let charmPreviousX = 0;
+    let suppressCharmClick = false;
 
     const avatarMotionAllowed = () => (
-        document.documentElement.dataset.motion !== 'off' && !reducedMotionPreference.matches && avatarPastHero
+        document.documentElement.dataset.motion !== 'off' && !reducedMotionPreference.matches
     );
+
+    const clampCharmAngle = (angle) => Math.max(-1.05, Math.min(1.05, angle));
+
+    const updateCharmAngle = () => {
+        avatarCharmRig.style.setProperty('--swing-angle', (charmAngle * 180 / Math.PI).toFixed(2) + 'deg');
+    };
+
+    const stopCharmSwing = () => {
+        if (charmFrame !== null) {
+            window.cancelAnimationFrame(charmFrame);
+            charmFrame = null;
+        }
+        charmLastFrame = 0;
+    };
+
+    const startCharmSwing = () => {
+        if (charmFrame !== null || !avatarMotionAllowed() || avatarCompanion.dataset.mode !== 'charm') return;
+
+        const swing = (timestamp) => {
+            if (!avatarMotionAllowed() || avatarCompanion.dataset.mode !== 'charm') {
+                charmFrame = null;
+                charmLastFrame = 0;
+                return;
+            }
+
+            if (charmLastFrame && !charmDragging) {
+                const delta = Math.min((timestamp - charmLastFrame) / 1000, .04);
+                const chainLength = Math.max(1, avatarCharmChain.offsetHeight);
+                const acceleration = -(1100 / chainLength) * Math.sin(charmAngle) - 2.05 * charmAngularVelocity;
+                charmAngularVelocity += acceleration * delta;
+                charmAngle += charmAngularVelocity * delta;
+
+                if (Math.abs(charmAngle) > 1.05) {
+                    charmAngle = clampCharmAngle(charmAngle);
+                    charmAngularVelocity *= -.38;
+                }
+
+                if (Math.abs(charmAngle) < .001 && Math.abs(charmAngularVelocity) < .006) {
+                    charmAngle = 0;
+                    charmAngularVelocity = 0;
+                    updateCharmAngle();
+                    charmFrame = null;
+                    charmLastFrame = 0;
+                    return;
+                }
+            }
+
+            charmLastFrame = timestamp;
+            updateCharmAngle();
+            charmFrame = window.requestAnimationFrame(swing);
+        };
+
+        charmFrame = window.requestAnimationFrame(swing);
+    };
 
     const syncAvatarAnchor = () => {
         const actorBounds = avatarActor.getBoundingClientRect();
@@ -333,8 +411,12 @@ if (avatarCompanion) {
         avatarCompanion.dataset.pose = phase.pose;
         avatarCaption.textContent = phase.caption;
         avatarIcon.textContent = phase.icon;
+        const imagePose = phase.imagePose || phase.pose;
         avatarImages.forEach((image) => {
-            image.classList.toggle('is-active', image.dataset.avatarImage === phase.pose);
+            image.classList.toggle('is-active', image.dataset.avatarImage === imagePose);
+        });
+        avatarActionButtons.forEach((button) => {
+            button.classList.toggle('is-active', button.dataset.avatarAction === phase.action);
         });
         syncAvatarAnchor();
     };
@@ -361,9 +443,14 @@ if (avatarCompanion) {
         avatarRunning = false;
     };
 
-    const finishAvatarWalk = () => {
-        if (avatarCompanion.dataset.pose !== 'walk' || !avatarAnimation) return;
-        avatarActor.style.left = avatarTargetLeft + 'px';
+    const stopAvatarMovement = (snapToTarget = false) => {
+        if (!avatarAnimation) return;
+        const currentLeft = Number.parseFloat(window.getComputedStyle(avatarActor).left);
+        if (snapToTarget && Number.isFinite(avatarTargetLeft)) {
+            avatarActor.style.left = avatarTargetLeft + 'px';
+        } else if (Number.isFinite(currentLeft)) {
+            avatarActor.style.left = currentLeft + 'px';
+        }
         avatarAnimation.cancel();
         avatarAnimation = null;
         syncAvatarAnchor();
@@ -377,7 +464,7 @@ if (avatarCompanion) {
             avatarTimer = null;
             avatarRunning = false;
             avatarRemaining = 0;
-            finishAvatarWalk();
+            stopAvatarMovement(true);
 
             if (avatarPhaseIndex === avatarPhases.length - 1) avatarDirection *= -1;
             beginAvatarPhase((avatarPhaseIndex + 1) % avatarPhases.length);
@@ -387,8 +474,7 @@ if (avatarCompanion) {
     const beginAvatarPhase = (index) => {
         if (!avatarMotionAllowed() || avatarManuallyPaused) return;
         stopAvatarTimer();
-        avatarAnimation?.cancel();
-        avatarAnimation = null;
+        stopAvatarMovement();
         avatarPhaseIndex = index;
         const phase = avatarPhases[index];
         setAvatarPhase(phase);
@@ -399,15 +485,116 @@ if (avatarCompanion) {
             avatarTargetLeft = avatarDirection > 0 ? Math.max(12, window.innerWidth - actorWidth - 12) : 12;
             avatarActor.style.left = start + 'px';
             avatarActor.classList.toggle('is-reversed', avatarDirection < 0);
+            syncAvatarAnchor();
             const distance = Math.abs(avatarTargetLeft - start);
             avatarAnimation = avatarActor.animate(
                 [{ left: start + 'px' }, { left: avatarTargetLeft + 'px' }],
                 { duration: phase.duration, easing: 'linear', fill: 'forwards' },
             );
             if (!distance) avatarAnimation.finish();
+        } else if (phase.move === 'workstation') {
+            const actorWidth = avatarActor.getBoundingClientRect().width;
+            const start = -actorWidth - 32;
+            avatarTargetLeft = 12;
+            avatarActor.classList.remove('is-reversed');
+            avatarActor.style.left = start + 'px';
+            syncAvatarAnchor();
+            avatarAnimation = avatarActor.animate(
+                [
+                    { left: start + 'px', transform: 'translateY(5px) scale(.98)' },
+                    { left: (avatarTargetLeft + 18) + 'px', transform: 'translateY(0) scale(1)', offset: .82 },
+                    { left: avatarTargetLeft + 'px', transform: 'translateY(0) scale(1)' },
+                ],
+                { duration: 1250, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' },
+            );
         }
 
         scheduleAvatarPhase(phase.duration);
+    };
+
+    const finishAvatarArrival = (continueCycle = false, phaseIndex = 0) => {
+        if (avatarArrivalTimer !== null) {
+            window.clearTimeout(avatarArrivalTimer);
+            avatarArrivalTimer = null;
+        }
+
+        if (avatarArrivalAnimation) {
+            avatarActor.style.left = '12px';
+            avatarActor.style.top = 'auto';
+            avatarActor.style.bottom = '0px';
+            avatarActor.style.width = '';
+            avatarActor.style.height = '';
+            avatarActor.style.transform = 'none';
+            avatarActor.style.transformOrigin = '';
+            avatarArrivalAnimation.cancel();
+            avatarArrivalAnimation = null;
+        }
+
+        avatarCompanion.classList.remove('is-arriving');
+        syncAvatarAnchor();
+        if (continueCycle && avatarMotionAllowed() && !avatarManuallyPaused) beginAvatarPhase(phaseIndex);
+    };
+
+    const activateAvatar = (phaseIndex = 0) => {
+        if (!avatarMotionAllowed() || avatarCompanion.dataset.mode === 'active') return;
+
+        stopCharmSwing();
+        stopAvatarTimer();
+        avatarManuallyPaused = false;
+        const pendantBounds = avatarPendant.getBoundingClientRect();
+        const arrivalAngle = charmAngle * 180 / Math.PI;
+
+        avatarCompanion.dataset.mode = 'active';
+        avatarCompanion.classList.add('is-arriving');
+        setAvatarPhase({ pose: 'idle', action: 'walk', caption: 'Coming down to meet you', icon: '↘' });
+
+        const targetBounds = avatarActor.getBoundingClientRect();
+        const targetWidth = targetBounds.width;
+        const targetHeight = targetBounds.height;
+        const targetLeft = 12;
+        const targetTop = Math.max(12, window.innerHeight - targetHeight);
+        avatarTargetLeft = targetLeft;
+        avatarActor.style.left = pendantBounds.left + 'px';
+        avatarActor.style.top = pendantBounds.top + 'px';
+        avatarActor.style.bottom = 'auto';
+        avatarActor.style.width = pendantBounds.width + 'px';
+        avatarActor.style.height = pendantBounds.height + 'px';
+        avatarActor.style.transformOrigin = '50% 50%';
+        syncAvatarAnchor();
+
+        avatarArrivalAnimation = avatarActor.animate(
+            [
+                {
+                    left: pendantBounds.left + 'px',
+                    top: pendantBounds.top + 'px',
+                    width: pendantBounds.width + 'px',
+                    height: pendantBounds.height + 'px',
+                    transform: 'rotate(' + arrivalAngle.toFixed(1) + 'deg) scale(.96)',
+                    opacity: 1,
+                },
+                {
+                    left: (targetLeft + 16) + 'px',
+                    top: (targetTop + 12) + 'px',
+                    width: targetWidth + 'px',
+                    height: targetHeight + 'px',
+                    transform: 'rotate(-7deg) scale(1.04)',
+                    opacity: 1,
+                    offset: .84,
+                },
+                {
+                    left: targetLeft + 'px',
+                    top: targetTop + 'px',
+                    width: targetWidth + 'px',
+                    height: targetHeight + 'px',
+                    transform: 'rotate(0deg) scale(1)',
+                    opacity: 1,
+                },
+            ],
+            { duration: 1450, easing: 'cubic-bezier(.2,.75,.25,1)', fill: 'forwards' },
+        );
+
+        updateAvatarPauseControl();
+        avatarArrivalTimer = window.setTimeout(() => finishAvatarArrival(true, phaseIndex), 1450);
     };
 
     const resumeAvatarPhase = () => {
@@ -427,8 +614,13 @@ if (avatarCompanion) {
         avatarCompanion.classList.toggle('is-motion-off', !motionAllowed);
 
         if (!motionAllowed) {
+            stopCharmSwing();
+            if (avatarArrivalAnimation) finishAvatarArrival(false);
             pauseAvatarPhase();
-        } else if (!avatarManuallyPaused) {
+        } else if (avatarCompanion.dataset.mode === 'charm') {
+            startCharmSwing();
+            if (avatarPastHero) activateAvatar();
+        } else if (!avatarManuallyPaused && !avatarCompanion.classList.contains('is-arriving')) {
             resumeAvatarPhase();
         }
 
@@ -443,10 +635,130 @@ if (avatarCompanion) {
     };
 
     avatarToggle.addEventListener('click', () => {
+        if (avatarCompanion.dataset.mode === 'charm') {
+            activateAvatar();
+            return;
+        }
+
         avatarManuallyPaused = !avatarManuallyPaused;
         if (avatarManuallyPaused) pauseAvatarPhase();
         else resumeAvatarPhase();
         updateAvatarPauseControl();
+    });
+
+    const getCharmAngleFromPointer = (event) => {
+        const bounds = avatarCharm.getBoundingClientRect();
+        const anchorX = bounds.left + bounds.width / 2;
+        const anchorY = bounds.top;
+        return clampCharmAngle(Math.atan2(event.clientX - anchorX, Math.max(1, event.clientY - anchorY)));
+    };
+
+    avatarPendant.addEventListener('pointerenter', (event) => {
+        if (avatarCompanion.dataset.mode !== 'charm' || event.pointerType !== 'mouse') return;
+        const bounds = avatarCharm.getBoundingClientRect();
+        charmAngularVelocity += event.clientX < bounds.left + bounds.width / 2 ? -.28 : .28;
+        startCharmSwing();
+    });
+
+    avatarPendant.addEventListener('pointerdown', (event) => {
+        if (avatarCompanion.dataset.mode !== 'charm' || (event.pointerType === 'mouse' && event.button !== 0)) return;
+        charmDragging = true;
+        charmDragMoved = false;
+        charmStartX = event.clientX;
+        charmStartY = event.clientY;
+        charmLastPointerAngle = getCharmAngleFromPointer(event);
+        charmLastPointerTime = event.timeStamp;
+        charmPreviousX = event.clientX;
+        avatarPendant.setPointerCapture(event.pointerId);
+        event.preventDefault();
+    });
+
+    avatarPendant.addEventListener('pointermove', (event) => {
+        if (avatarCompanion.dataset.mode !== 'charm') return;
+
+        if (charmDragging) {
+            const angle = getCharmAngleFromPointer(event);
+            const elapsed = Math.max(.008, (event.timeStamp - charmLastPointerTime) / 1000);
+            charmAngularVelocity = Math.max(-5, Math.min(5, (angle - charmLastPointerAngle) / elapsed));
+            charmAngle = angle;
+            charmDragMoved = charmDragMoved || Math.hypot(event.clientX - charmStartX, event.clientY - charmStartY) > 7;
+            charmLastPointerAngle = angle;
+            charmLastPointerTime = event.timeStamp;
+            updateCharmAngle();
+            startCharmSwing();
+            return;
+        }
+
+        if (event.pointerType === 'mouse') {
+            const movement = event.clientX - charmPreviousX;
+            if (Math.abs(movement) > 1) {
+                charmAngularVelocity += Math.max(-1, Math.min(1, movement / 34)) * .075;
+                charmPreviousX = event.clientX;
+                startCharmSwing();
+            }
+        }
+    });
+
+    const releaseCharmPointer = () => {
+        if (!charmDragging) return;
+        const tap = !charmDragMoved;
+        charmDragging = false;
+        suppressCharmClick = true;
+        window.setTimeout(() => { suppressCharmClick = false; }, 0);
+        startCharmSwing();
+        if (tap) activateAvatar();
+    };
+
+    avatarPendant.addEventListener('pointerup', releaseCharmPointer);
+    avatarPendant.addEventListener('pointercancel', releaseCharmPointer);
+    avatarPendant.addEventListener('lostpointercapture', releaseCharmPointer);
+    avatarPendant.addEventListener('click', (event) => {
+        if (suppressCharmClick) {
+            event.preventDefault();
+            return;
+        }
+        if (event.detail === 0 && avatarCompanion.dataset.mode === 'charm') activateAvatar();
+    });
+    avatarPendant.addEventListener('keydown', (event) => {
+        if (avatarCompanion.dataset.mode !== 'charm' || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        charmAngularVelocity += event.key === 'ArrowLeft' ? -1.25 : 1.25;
+        startCharmSwing();
+    });
+
+    const setAvatarMenuOpen = (isOpen) => {
+        avatarMenu.hidden = !isOpen;
+        avatarCompanion.classList.toggle('is-menu-open', isOpen);
+        avatarMenuToggle.setAttribute('aria-expanded', String(isOpen));
+        avatarMenuToggle.setAttribute('aria-label', isOpen ? 'Close avatar actions' : 'Choose an avatar action');
+        avatarMenuToggle.textContent = isOpen ? '×' : '＋';
+    };
+
+    avatarMenuToggle.addEventListener('click', () => {
+        setAvatarMenuOpen(avatarMenuToggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    avatarActionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const phaseIndex = avatarPhases.findIndex((phase) => phase.action === button.dataset.avatarAction);
+            if (phaseIndex < 0) return;
+            setAvatarMenuOpen(false);
+            avatarManuallyPaused = false;
+            beginAvatarPhase(phaseIndex);
+            updateAvatarPauseControl();
+        });
+    });
+
+    document.addEventListener('pointerdown', (event) => {
+        if (!avatarCompanion.contains(event.target) && avatarMenuToggle.getAttribute('aria-expanded') === 'true') {
+            setAvatarMenuOpen(false);
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && avatarMenuToggle.getAttribute('aria-expanded') === 'true') {
+            setAvatarMenuOpen(false);
+            avatarMenuToggle.focus();
+        }
     });
 
     window.addEventListener('resize', () => {
