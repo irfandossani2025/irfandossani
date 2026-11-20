@@ -2,14 +2,20 @@ const menuButton = document.querySelector('.menu-toggle');
 const siteNavigation = document.querySelector('.site-navigation');
 
 if (menuButton && siteNavigation) {
+    const menuLabel = menuButton.querySelector('.menu-toggle__label');
+
     const closeMenu = () => {
         menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', 'Open navigation');
+        if (menuLabel) menuLabel.textContent = 'Menu';
         siteNavigation.classList.remove('is-open');
     };
 
     menuButton.addEventListener('click', () => {
         const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
         menuButton.setAttribute('aria-expanded', String(!isOpen));
+        menuButton.setAttribute('aria-label', isOpen ? 'Open navigation' : 'Close navigation');
+        if (menuLabel) menuLabel.textContent = isOpen ? 'Menu' : 'Close';
         siteNavigation.classList.toggle('is-open', !isOpen);
     });
 
@@ -34,6 +40,63 @@ if (progressBar) {
     window.addEventListener('scroll', updateProgress, { passive: true });
     window.addEventListener('resize', updateProgress);
     updateProgress();
+}
+
+const motionToggle = document.querySelector('[data-motion-toggle]');
+const motionLabel = document.querySelector('[data-motion-label]');
+const reducedMotionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+let motionEnabled = !reducedMotionPreference.matches;
+
+if (motionToggle) {
+    if (!reducedMotionPreference.matches) {
+        try {
+            motionEnabled = window.localStorage.getItem('irfan-motion') !== 'off';
+        } catch (error) {
+            motionEnabled = true;
+        }
+    }
+
+    const updateMotionPreference = () => {
+        const isEnabled = motionEnabled && !reducedMotionPreference.matches;
+        document.documentElement.dataset.motion = isEnabled ? 'on' : 'off';
+        motionToggle.setAttribute('aria-pressed', String(isEnabled));
+        motionToggle.setAttribute('aria-label', isEnabled ? 'Pause decorative motion' : 'Play decorative motion');
+        motionToggle.disabled = reducedMotionPreference.matches;
+        if (motionLabel) motionLabel.textContent = reducedMotionPreference.matches ? 'Reduced' : (isEnabled ? 'On' : 'Off');
+    };
+
+    motionToggle.addEventListener('click', () => {
+        motionEnabled = !motionEnabled;
+        updateMotionPreference();
+        try {
+            window.localStorage.setItem('irfan-motion', motionEnabled ? 'on' : 'off');
+        } catch (error) {
+            // The motion setting still applies for this page when storage is unavailable.
+        }
+    });
+
+    reducedMotionPreference.addEventListener?.('change', updateMotionPreference);
+    updateMotionPreference();
+}
+
+const heroVisual = document.querySelector('[data-hero-visual]');
+const parallaxCard = document.querySelector('[data-parallax-card]');
+
+if (heroVisual && parallaxCard && !reducedMotionPreference.matches) {
+    heroVisual.addEventListener('pointermove', (event) => {
+        if (event.pointerType !== 'mouse' || document.documentElement.dataset.motion === 'off') return;
+
+        const bounds = heroVisual.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        parallaxCard.style.setProperty('--pointer-x', (x * 12).toFixed(1) + 'px');
+        parallaxCard.style.setProperty('--pointer-y', (y * 12).toFixed(1) + 'px');
+    });
+
+    heroVisual.addEventListener('pointerleave', () => {
+        parallaxCard.style.setProperty('--pointer-x', '0px');
+        parallaxCard.style.setProperty('--pointer-y', '0px');
+    });
 }
 
 const filterButtons = [...document.querySelectorAll('[data-filter]')];

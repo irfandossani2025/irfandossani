@@ -5,86 +5,49 @@
 @section('body_class', 'project-page')
 
 @section('head')
-    <link rel="stylesheet" href="{{ asset('css/project.css') }}?v=1.0.0">
+    <link rel="stylesheet" href="{{ asset('css/project.css') }}?v=2.0.0">
 @endsection
 
 @section('content')
 <main id="main">
     <section class="project-hero section-shell">
-        <a class="back-link" href="{{ route('home') }}#work">Back to selected work</a>
-        <div class="project-hero__top">
-            <div class="project-hero__copy">
-                <p class="eyebrow">{{ $project['category'] }} <span>/</span> {{ $project['type'] }}</p>
-                <h1>{{ $project['name'] }}</h1>
-                <p class="project-standfirst">{{ $project['summary'] }}</p>
-            </div>
-            <aside class="project-hero__facts">
-                <div class="project-fact">
-                    <span class="eyebrow">Project stage</span>
-                    <strong>{{ $project['status'] }}</strong>
-                </div>
-                <div class="project-fact">
-                    <span class="eyebrow">Tools & themes</span>
-                    <div class="project-tags">
-                        @foreach ($project['stack'] as $item)
-                            <span>{{ $item }}</span>
-                        @endforeach
-                    </div>
-                </div>
-                @foreach ($project['external_links'] as $link)
-                    <a class="project-fact-link" href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer">{{ $link['label'] }}</a>
-                @endforeach
-            </aside>
+        <a class="back-link" href="{{ route('home') }}#work"><span aria-hidden="true">←</span> Back to selected work</a>
+        <div class="project-hero__heading" data-reveal>
+            <div class="project-hero__eyebrow"><span>PROJECT {{ strtoupper($project['category']) }}</span><i aria-hidden="true"></i><span>{{ $project['type'] }}</span></div>
+            <h1>{{ $project['name'] }}<span>.</span></h1>
+            <p class="project-standfirst">{{ $project['summary'] }}</p>
         </div>
-        <div class="project-hero__art">
-            @include('partials.project-art', ['project' => $project])
+        <div class="project-hero__meta" data-reveal>
+            <div class="project-fact"><span>Stage</span><strong>{{ $project['status'] }}</strong></div>
+            <div class="project-fact"><span>Focus</span><div class="project-tags">@foreach ($project['stack'] as $item)<span>{{ $item }}</span>@endforeach</div></div>
+            <div class="project-links">@foreach ($project['external_links'] as $link)<a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer">{{ $link['label'] }} <span aria-hidden="true">↗</span></a>@endforeach</div>
+            <span class="project-hero__index">ID / {{ str_pad((string) (array_search($project['slug'], array_column(array_values($portfolio['projects']), 'slug'), true) + 1), 2, '0', STR_PAD_LEFT) }}</span>
         </div>
+    </section>
+
+    <section class="project-full-art section-shell" data-reveal>
+        @include('partials.project-art', ['project' => $project])
+        <span class="project-full-art__caption">{{ $project['art_kicker'] }} <i>—</i> {{ $project['status'] }}</span>
     </section>
 
     <section class="project-story section-shell">
-        <article class="project-story__challenge">
-            <p class="eyebrow">The challenge</p>
-            <h2>Make the next step<br><em>feel clearer.</em></h2>
-            <p>{{ $project['challenge'] }}</p>
-        </article>
-        <article class="project-story__approach">
-            <p class="eyebrow">The approach</p>
-            <ul>
-                @foreach ($project['approach'] as $step)
-                    <li>{{ $step }}</li>
-                @endforeach
-            </ul>
-        </article>
-        <aside class="project-story__contribution">
-            <p class="eyebrow">My contribution</p>
-            <ul>
-                @foreach ($project['contribution'] as $item)
-                    <li>{{ $item }}</li>
-                @endforeach
-            </ul>
-        </aside>
+        <div class="project-story__heading" data-reveal><p class="eyebrow">The brief / the build</p><h2>Make the next<br><em>move count.</em></h2></div>
+        <article class="project-story__challenge" data-reveal><span class="story-label">01 / The challenge</span><p>{{ $project['challenge'] }}</p></article>
+        <article class="project-story__approach" data-reveal><span class="story-label">02 / The approach</span><ul>@foreach ($project['approach'] as $step)<li><span>↗</span>{{ $step }}</li>@endforeach</ul></article>
+        <aside class="project-story__contribution" data-reveal><span class="story-label">03 / My contribution</span><ul>@foreach ($project['contribution'] as $item)<li>{{ $item }}</li>@endforeach</ul></aside>
     </section>
 
     <section class="related-section section-shell">
-        <div class="related-heading">
-            <div><p class="eyebrow">More selected work</p><h2>Keep exploring.</h2></div>
-            <a class="text-link" href="{{ route('home') }}#work">View all projects</a>
-        </div>
+        <div class="related-heading" data-reveal><div><p class="eyebrow">Another angle</p><h2>Keep the<br><em>momentum.</em></h2></div><a class="button button-quiet" href="{{ route('home') }}#work">All projects <span aria-hidden="true">↗</span></a></div>
         <div class="related-grid">
-            @foreach ($related as $item)
-                <a class="related-card" href="{{ route('projects.show', $item['slug']) }}">
-                    @include('partials.project-art', ['project' => $item])
-                    <span class="eyebrow">{{ $item['type'] }}</span>
-                    <strong>{{ $item['name'] }}</strong>
-                </a>
+            @foreach ($related as $index => $item)
+                <a class="related-card" href="{{ route('projects.show', $item['slug']) }}" data-reveal><div class="related-card__art">@include('partials.project-art', ['project' => $item])<span aria-hidden="true">0{{ $index + 1 }}</span></div><div class="related-card__body"><span class="eyebrow">{{ $item['type'] }} / {{ $item['status'] }}</span><strong>{{ $item['name'] }}</strong><span class="related-card__arrow" aria-hidden="true">↗</span></div></a>
             @endforeach
         </div>
     </section>
 
-    <section class="project-contact section-shell">
-        <p class="eyebrow">Have a business challenge?</p>
-        <h2>Let’s find a useful<br><em>next step.</em></h2>
-        <a class="button button-primary" href="mailto:{{ $portfolio['email'] }}">Email {{ $portfolio['display_name'] }}</a>
+    <section class="project-contact">
+        <div class="project-contact__inner section-shell"><p class="eyebrow">Have a business question?</p><h2>Let’s find the<br><em>next move.</em></h2><a class="button button-primary" href="mailto:{{ $portfolio['email'] }}">Email {{ $portfolio['display_name'] }} <span aria-hidden="true">↗</span></a></div>
     </section>
 </main>
 @endsection

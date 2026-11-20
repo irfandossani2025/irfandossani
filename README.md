@@ -6,7 +6,8 @@ A responsive Laravel portfolio for marketing, branding, digital experience and b
 
 - Professional profile and career history based on Irfan's résumé.
 - Selected business, brand and product projects, with project story pages.
-- Project category filters, a responsive mobile menu, scroll reveals and a guided challenge selector.
+- Project category filters, a responsive mobile menu, a guided challenge selector, and a motion control for visitors.
+- Cinematic CSS motion: staggered title entrances, orbiting graphics, an animated project marquee, reactive hover states, portrait parallax, and scroll reveals. Motion follows the visitor's reduced-motion setting.
 - Irfan 2.0 assistant with optional Anthropic replies and a consent-based project-note handoff.
 - Optimized WebP portrait and project visuals.
 
