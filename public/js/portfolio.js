@@ -317,7 +317,8 @@ if (avatarCompanion) {
         { pose: 'phone', action: 'call', caption: 'Taking a call', icon: '☎', duration: 3900 },
         { pose: 'message', action: 'message', caption: 'Sending a note', icon: '✉', duration: 3900 },
         { pose: 'work', action: 'work', caption: 'Setting up to work', icon: '⌨', duration: 6800, move: 'workstation' },
-        { pose: 'dance', action: 'dance', caption: 'Dance break', icon: '♪', duration: 4500 },
+        { pose: 'dance', imagePose: 'none', action: 'dance', caption: 'Moonwalking', icon: '♪', duration: 7200, move: 'moonwalk' },
+        { pose: 'pushups', imagePose: 'none', action: 'pushups', caption: 'Getting a few reps in', icon: '↗', duration: 7200 },
     ];
     let avatarPhaseIndex = -1;
     let avatarDirection = 1;
@@ -507,6 +508,31 @@ if (avatarCompanion) {
                 ],
                 { duration: 1250, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' },
             );
+        } else if (phase.move === 'moonwalk') {
+            const actorWidth = avatarActor.getBoundingClientRect().width;
+            const maxLeft = Math.max(12, window.innerWidth - actorWidth - 12);
+            const currentLeft = Number.parseFloat(window.getComputedStyle(avatarActor).left);
+            const start = Math.max(12, Math.min(maxLeft, Number.isFinite(currentLeft) ? currentLeft : 12));
+            const travel = Math.min(Math.max(180, window.innerWidth * .22), 300);
+            const leftSpace = start - 12;
+            const rightSpace = maxLeft - start;
+            const glideRight = leftSpace < travel && rightSpace > leftSpace;
+            avatarTargetLeft = glideRight ? Math.min(maxLeft, start + travel) : Math.max(12, start - travel);
+            avatarActor.style.left = start + 'px';
+            avatarActor.classList.toggle('is-reversed', glideRight);
+            syncAvatarAnchor();
+            avatarAnimation = avatarActor.animate(
+                [{ left: start + 'px' }, { left: avatarTargetLeft + 'px' }],
+                { duration: phase.duration, easing: 'linear', fill: 'forwards' },
+            );
+        } else if (phase.pose === 'pushups') {
+            const actorWidth = avatarActor.getBoundingClientRect().width;
+            const maxLeft = Math.max(12, window.innerWidth - actorWidth - 12);
+            const currentLeft = Number.parseFloat(window.getComputedStyle(avatarActor).left);
+            const start = Math.max(12, Math.min(maxLeft, Number.isFinite(currentLeft) ? currentLeft : 12));
+            avatarActor.style.left = start + 'px';
+            avatarActor.classList.remove('is-reversed');
+            syncAvatarAnchor();
         }
 
         scheduleAvatarPhase(phase.duration);

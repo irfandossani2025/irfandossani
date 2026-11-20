@@ -16,9 +16,10 @@
             <img src="{{ asset('images/irfan-avatar-phone-reach.webp') }}" alt="" width="1024" height="1536" data-avatar-image="phone-reach">
             <img src="{{ asset('images/irfan-avatar-phone.webp') }}" alt="" width="1024" height="1536" data-avatar-image="phone">
             <img src="{{ asset('images/irfan-avatar-message.webp') }}" alt="" width="1024" height="1536" data-avatar-image="message">
-            <img src="{{ asset('images/irfan-avatar-dance.webp') }}" alt="" width="1024" height="1536" data-avatar-image="dance">
             <img src="{{ asset('images/irfan-avatar-workstation.webp') }}" alt="" width="1312" height="1199" data-avatar-image="work">
             <div class="avatar-companion__walk-cycle" data-avatar-walk-cycle></div>
+            <div class="avatar-companion__dance-cycle" data-avatar-dance-cycle></div>
+            <div class="avatar-companion__pushup-cycle" data-avatar-pushup-cycle></div>
             <span class="avatar-companion__ring" data-avatar-ring aria-hidden="true"><i>☎</i><b>•••</b></span>
         </div>
         <div class="avatar-companion__bubble-wrap">
@@ -36,6 +37,7 @@
             <button type="button" data-avatar-action="message"><span aria-hidden="true">✉</span>Message</button>
             <button type="button" data-avatar-action="work"><span aria-hidden="true">⌨</span>Work</button>
             <button type="button" data-avatar-action="dance"><span aria-hidden="true">♪</span>Dance</button>
+            <button type="button" data-avatar-action="pushups"><span aria-hidden="true">↗</span>Push-ups</button>
         </div>
     </div>
 </aside>
