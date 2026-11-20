@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v=2.3.1">
+    <link rel="stylesheet" href="{{ asset('css/portfolio.css') }}?v=2.4.1">
     @yield('head')
     <title>@yield('title', 'Irfan Dossani — Marketing, Branding & Digital Experiences')</title>
 </head>
@@ -27,7 +27,8 @@
     @include('partials.navigation', ['portfolio' => $portfolio])
     @yield('content')
     @include('partials.footer', ['portfolio' => $portfolio])
-    <script src="{{ asset('js/portfolio.js') }}?v=2.2.2" defer></script>
+    @include('partials.avatar-companion')
+    <script src="{{ asset('js/portfolio.js') }}?v=2.4.1" defer></script>
     @yield('scripts')
 </body>
 </html>

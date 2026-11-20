@@ -291,3 +291,177 @@ document.querySelector('.lead-form')?.addEventListener('submit', async (event) =
         submitButton.disabled = false;
     }
 });
+
+const avatarCompanion = document.querySelector('[data-avatar-companion]');
+
+if (avatarCompanion) {
+    const avatarActor = avatarCompanion.querySelector('[data-avatar-actor]');
+    const avatarToggle = avatarCompanion.querySelector('[data-avatar-toggle]');
+    const avatarCaption = avatarCompanion.querySelector('[data-avatar-caption]');
+    const avatarIcon = avatarCompanion.querySelector('[data-avatar-icon]');
+    const avatarControlIcon = avatarCompanion.querySelector('[data-avatar-control-icon]');
+    const avatarImages = [...avatarCompanion.querySelectorAll('[data-avatar-image]')];
+    const avatarHero = document.querySelector('.hero-section');
+    const avatarPhases = [
+        { pose: 'walk', caption: 'On the move', icon: '↗', duration: 7800 },
+        { pose: 'think', caption: 'Thinking it through', icon: '✦', duration: 4100 },
+        { pose: 'phone', caption: 'Taking a call', icon: '☎', duration: 4300 },
+        { pose: 'message', caption: 'Sending a note', icon: '✉', duration: 4100 },
+        { pose: 'dance', caption: 'Dance break', icon: '♪', duration: 4600 },
+    ];
+    let avatarPhaseIndex = -1;
+    let avatarDirection = 1;
+    let avatarAnimation = null;
+    let avatarTargetLeft = 0;
+    let avatarTimer = null;
+    let avatarDeadline = 0;
+    let avatarRemaining = 0;
+    let avatarRunning = false;
+    let avatarManuallyPaused = false;
+    let avatarPastHero = !avatarHero || avatarHero.getBoundingClientRect().bottom <= 0;
+
+    const avatarMotionAllowed = () => (
+        document.documentElement.dataset.motion !== 'off' && !reducedMotionPreference.matches && avatarPastHero
+    );
+
+    const syncAvatarAnchor = () => {
+        const actorBounds = avatarActor.getBoundingClientRect();
+        avatarCompanion.dataset.anchor = actorBounds.left + actorBounds.width / 2 > window.innerWidth / 2 ? 'right' : 'left';
+    };
+
+    const setAvatarPhase = (phase) => {
+        avatarCompanion.dataset.pose = phase.pose;
+        avatarCaption.textContent = phase.caption;
+        avatarIcon.textContent = phase.icon;
+        avatarImages.forEach((image) => {
+            image.classList.toggle('is-active', image.dataset.avatarImage === phase.pose);
+        });
+        syncAvatarAnchor();
+    };
+
+    const updateAvatarPauseControl = () => {
+        avatarCompanion.classList.toggle('is-paused', avatarManuallyPaused || !avatarMotionAllowed());
+        avatarToggle.setAttribute('aria-pressed', String(avatarManuallyPaused));
+        avatarToggle.setAttribute('aria-label', avatarManuallyPaused ? 'Resume the animated avatar' : 'Pause the animated avatar');
+        avatarControlIcon.textContent = avatarManuallyPaused ? '▶' : 'Ⅱ';
+    };
+
+    const stopAvatarTimer = () => {
+        if (avatarTimer !== null) {
+            window.clearTimeout(avatarTimer);
+            avatarTimer = null;
+        }
+    };
+
+    const pauseAvatarPhase = () => {
+        if (!avatarRunning) return;
+        avatarRemaining = Math.max(0, avatarDeadline - performance.now());
+        stopAvatarTimer();
+        avatarAnimation?.pause();
+        avatarRunning = false;
+    };
+
+    const finishAvatarWalk = () => {
+        if (avatarCompanion.dataset.pose !== 'walk' || !avatarAnimation) return;
+        avatarActor.style.left = avatarTargetLeft + 'px';
+        avatarAnimation.cancel();
+        avatarAnimation = null;
+        syncAvatarAnchor();
+    };
+
+    const scheduleAvatarPhase = (duration) => {
+        avatarRemaining = duration;
+        avatarDeadline = performance.now() + duration;
+        avatarRunning = true;
+        avatarTimer = window.setTimeout(() => {
+            avatarTimer = null;
+            avatarRunning = false;
+            avatarRemaining = 0;
+            finishAvatarWalk();
+
+            if (avatarPhaseIndex === avatarPhases.length - 1) avatarDirection *= -1;
+            beginAvatarPhase((avatarPhaseIndex + 1) % avatarPhases.length);
+        }, duration);
+    };
+
+    const beginAvatarPhase = (index) => {
+        if (!avatarMotionAllowed() || avatarManuallyPaused) return;
+        stopAvatarTimer();
+        avatarAnimation?.cancel();
+        avatarAnimation = null;
+        avatarPhaseIndex = index;
+        const phase = avatarPhases[index];
+        setAvatarPhase(phase);
+
+        if (phase.pose === 'walk') {
+            const actorWidth = avatarActor.getBoundingClientRect().width;
+            const start = avatarDirection > 0 ? 12 : Math.max(12, window.innerWidth - actorWidth - 12);
+            avatarTargetLeft = avatarDirection > 0 ? Math.max(12, window.innerWidth - actorWidth - 12) : 12;
+            avatarActor.style.left = start + 'px';
+            avatarActor.classList.toggle('is-reversed', avatarDirection < 0);
+            const distance = Math.abs(avatarTargetLeft - start);
+            avatarAnimation = avatarActor.animate(
+                [{ left: start + 'px' }, { left: avatarTargetLeft + 'px' }],
+                { duration: phase.duration, easing: 'linear', fill: 'forwards' },
+            );
+            if (!distance) avatarAnimation.finish();
+        }
+
+        scheduleAvatarPhase(phase.duration);
+    };
+
+    const resumeAvatarPhase = () => {
+        if (!avatarMotionAllowed() || avatarManuallyPaused || avatarRunning) return;
+        if (avatarPhaseIndex < 0) {
+            beginAvatarPhase(0);
+            return;
+        }
+
+        avatarAnimation?.play();
+        updateAvatarPauseControl();
+        scheduleAvatarPhase(avatarRemaining || avatarPhases[avatarPhaseIndex].duration);
+    };
+
+    const syncAvatarMotion = () => {
+        const motionAllowed = avatarMotionAllowed();
+        avatarCompanion.classList.toggle('is-motion-off', !motionAllowed);
+
+        if (!motionAllowed) {
+            pauseAvatarPhase();
+        } else if (!avatarManuallyPaused) {
+            resumeAvatarPhase();
+        }
+
+        updateAvatarPauseControl();
+    };
+
+    const syncAvatarHeroVisibility = () => {
+        const isPastHero = !avatarHero || avatarHero.getBoundingClientRect().bottom <= 0;
+        if (isPastHero === avatarPastHero) return;
+        avatarPastHero = isPastHero;
+        syncAvatarMotion();
+    };
+
+    avatarToggle.addEventListener('click', () => {
+        avatarManuallyPaused = !avatarManuallyPaused;
+        if (avatarManuallyPaused) pauseAvatarPhase();
+        else resumeAvatarPhase();
+        updateAvatarPauseControl();
+    });
+
+    window.addEventListener('resize', () => {
+        syncAvatarAnchor();
+        syncAvatarHeroVisibility();
+    });
+    window.addEventListener('scroll', syncAvatarHeroVisibility, { passive: true });
+    reducedMotionPreference.addEventListener?.('change', syncAvatarMotion);
+
+    new MutationObserver(syncAvatarMotion).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-motion'],
+    });
+
+    avatarCompanion.classList.add('is-ready');
+    syncAvatarHeroVisibility();
+    syncAvatarMotion();
+}
