@@ -3,12 +3,53 @@ const siteNavigation = document.querySelector('.site-navigation');
 
 if (menuButton && siteNavigation) {
     const menuLabel = menuButton.querySelector('.menu-toggle__label');
+    const navLens = siteNavigation.querySelector('[data-nav-lens]');
+    const navLinks = [...siteNavigation.querySelectorAll('a')];
+    let activeLensLink = null;
+
+    const placeNavLens = (link) => {
+        if (!navLens || !link) return;
+
+        const navBounds = siteNavigation.getBoundingClientRect();
+        const linkBounds = link.getBoundingClientRect();
+        navLens.style.width = linkBounds.width + 'px';
+        navLens.style.height = linkBounds.height + 'px';
+        navLens.style.setProperty('--lens-x', (linkBounds.left - navBounds.left) + 'px');
+        navLens.style.setProperty('--lens-y', (linkBounds.top - navBounds.top) + 'px');
+        siteNavigation.classList.add('has-lens');
+        activeLensLink = link;
+    };
+
+    const hideNavLens = () => {
+        if (!navLens || siteNavigation.contains(document.activeElement)) return;
+        siteNavigation.classList.remove('has-lens');
+        activeLensLink = null;
+    };
+
+    navLinks.forEach((link) => {
+        link.addEventListener('pointerenter', () => placeNavLens(link));
+    });
+
+    siteNavigation.addEventListener('focusin', (event) => {
+        const link = event.target.closest('a');
+        if (link) placeNavLens(link);
+    });
+
+    siteNavigation.addEventListener('pointerleave', hideNavLens);
+    siteNavigation.addEventListener('focusout', (event) => {
+        if (!siteNavigation.contains(event.relatedTarget)) hideNavLens();
+    });
+    window.addEventListener('resize', () => {
+        if (activeLensLink) placeNavLens(activeLensLink);
+    });
 
     const closeMenu = () => {
         menuButton.setAttribute('aria-expanded', 'false');
         menuButton.setAttribute('aria-label', 'Open navigation');
         if (menuLabel) menuLabel.textContent = 'Menu';
         siteNavigation.classList.remove('is-open');
+        siteNavigation.classList.remove('has-lens');
+        activeLensLink = null;
     };
 
     menuButton.addEventListener('click', () => {

@@ -6,6 +6,7 @@
         </a>
         <div class="header-actions">
             <nav class="site-navigation" id="site-navigation" aria-label="Main navigation">
+                <span class="nav-lens" data-nav-lens aria-hidden="true"></span>
                 <a href="{{ route('home') }}#work">Work <span>01</span></a>
                 <a href="{{ route('home') }}#approach">Approach <span>02</span></a>
                 <a href="{{ route('home') }}#experience">Experience <span>03</span></a>
