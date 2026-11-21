@@ -18,7 +18,6 @@
             <img src="{{ asset('images/irfan-avatar-message.webp') }}" alt="" width="1024" height="1536" data-avatar-image="message">
             <img src="{{ asset('images/irfan-avatar-workstation.webp') }}" alt="" width="1312" height="1199" data-avatar-image="work">
             <div class="avatar-companion__walk-cycle" data-avatar-walk-cycle></div>
-            <div class="avatar-companion__dance-cycle" data-avatar-dance-cycle></div>
             <div class="avatar-companion__pushup-cycle" data-avatar-pushup-cycle></div>
             <span class="avatar-companion__ring" data-avatar-ring aria-hidden="true"><i>☎</i><b>•••</b></span>
         </div>
@@ -36,7 +35,6 @@
             <button type="button" data-avatar-action="call"><span aria-hidden="true">☎</span>Call</button>
             <button type="button" data-avatar-action="message"><span aria-hidden="true">✉</span>Message</button>
             <button type="button" data-avatar-action="work"><span aria-hidden="true">⌨</span>Work</button>
-            <button type="button" data-avatar-action="dance"><span aria-hidden="true">♪</span>Dance</button>
             <button type="button" data-avatar-action="pushups"><span aria-hidden="true">↗</span>Push-ups</button>
         </div>
     </div>

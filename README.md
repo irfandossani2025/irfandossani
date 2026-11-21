@@ -5,9 +5,9 @@ A responsive Laravel portfolio for marketing, branding, digital experience and b
 ## Included
 
 - Professional profile and career history based on Irfan's résumé.
-- Selected business, brand and product projects, with project story pages.
+- Selected brand and business-systems projects, with project story pages.
 - Project category filters, a responsive mobile menu, a guided challenge selector, and a motion control for visitors.
-- A full-body cartoon avatar that begins as a chain-hung, flickable charm, then drops into a four-frame walk cycle, answers a ringing phone, messages, slides in a laptop workstation, thinks and dances. Visitors can choose actions or pause the companion from its glass-style controls; the motion follows reduced-motion settings.
+- A full-body cartoon avatar that begins as a chain-hung, flickable charm, then drops into a four-frame walk cycle, answers a ringing phone, messages, slides in a laptop workstation, thinks and does push-ups. Visitors can choose actions or pause the companion from its glass-style controls; the motion follows reduced-motion settings.
 - Cinematic CSS motion: staggered title entrances, orbiting graphics, an animated project marquee, reactive hover states, portrait parallax, and scroll reveals. Motion follows the visitor's reduced-motion setting.
 - Irfan 2.0 assistant with Claude replies limited to the verified portfolio and related business challenges, plus a consent-based project-note handoff.
 - Optimized WebP portrait and project visuals.

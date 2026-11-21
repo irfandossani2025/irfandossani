@@ -182,7 +182,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .art-lines { position: absolute; right: 21px; bottom: 20px; z-index: 3; display: flex; align-items: end; gap: 4px; height: 34px; opacity: .8; }
 .art-lines i { display: block; width: 4px; background: var(--art-accent); animation: meter 1.15s ease-in-out infinite alternate; }
 .art-lines i:nth-child(1) { height: 48%; animation-delay: -.7s; }.art-lines i:nth-child(2) { height: 78%; animation-delay: -.25s; }.art-lines i:nth-child(3) { height: 58%; animation-delay: -.95s; }.art-lines i:nth-child(4) { height: 100%; animation-delay: -.48s; }
-.art-mugdi { --art-a: #514044; --art-b: #1d1d21; --art-accent: #ffba79; }.art-powerbooks { --art-a: #34534e; --art-b: #122522; --art-accent: var(--acid); }.art-cleanflow { --art-a: #284e66; --art-b: #121f31; --art-accent: #90dcff; }.art-membership { --art-a: #554474; --art-b: #1d1b32; --art-accent: #d3bdff; }.art-waslah { --art-a: #397d75; --art-b: #142a2d; --art-accent: #a3f0c8; }.art-ewallet { --art-a: #743c4e; --art-b: #281d2a; --art-accent: #ffc087; }
+.art-powerbooks { --art-a: #34534e; --art-b: #122522; --art-accent: var(--acid); }.art-cleanflow { --art-a: #284e66; --art-b: #121f31; --art-accent: #90dcff; }.art-membership { --art-a: #554474; --art-b: #1d1b32; --art-accent: #d3bdff; }
 
 .approach-section { position: relative; overflow: hidden; background: var(--ink); color: var(--paper); }
 .approach-section::before { position: absolute; inset: 0; content: ""; pointer-events: none; opacity: .12; background-image: radial-gradient(rgba(255,255,255,.65) .6px,transparent .6px); background-size: 5px 5px; }
@@ -259,11 +259,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .avatar-companion__walk-cycle { position: absolute; inset: 0; display: none; background-image: url('../images/irfan-avatar-walk-cycle.webp'); background-repeat: no-repeat; background-size: 200% 200%; transform: scale(.94); transform-origin: center bottom; }
 .avatar-companion[data-pose="walk"] .avatar-companion__walk-cycle { display: block; animation: avatar-walk-cycle .96s steps(1,end) infinite; }
 .avatar-companion__actor.is-reversed .avatar-companion__walk-cycle { transform: scaleX(-1) scale(.94); }
-.avatar-companion__dance-cycle,.avatar-companion__pushup-cycle { position: absolute; inset: 0; display: none; background-repeat: no-repeat; background-size: 200% 200%; transform-origin: center bottom; }
-.avatar-companion__dance-cycle { background-image: url('../images/irfan-avatar-dance-cycle.webp'); transform: scale(.94); }
+.avatar-companion__pushup-cycle { position: absolute; inset: 0; display: none; background-repeat: no-repeat; background-size: 200% 200%; transform-origin: center bottom; }
 .avatar-companion__pushup-cycle { background-image: url('../images/irfan-avatar-pushups-cycle.webp'); transform: translateY(clamp(54px,8vh,72px)); }
-.avatar-companion[data-pose="dance"] .avatar-companion__dance-cycle { display: block; animation: avatar-dance-cycle 1.08s steps(1,end) infinite; }
-.avatar-companion__actor.is-reversed .avatar-companion__dance-cycle { transform: scaleX(-1) scale(.94); }
 .avatar-companion[data-pose="pushups"] .avatar-companion__pushup-cycle { display: block; animation: avatar-pushup-cycle 1.28s steps(1,end) infinite; }
 .avatar-companion[data-pose="pushups"] .avatar-companion__actor { width: var(--avatar-height); }
 .avatar-companion[data-pose="pushups"] .avatar-companion__actor { background: radial-gradient(ellipse at center bottom,rgba(23,24,22,.19),transparent 72%) center bottom / 90% 8px no-repeat; }
@@ -294,7 +291,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .avatar-companion[data-pose="work"] .avatar-companion__actor { width: var(--workstation-width); aspect-ratio: 1312 / 1199; }
 .avatar-companion[data-pose="work"] .avatar-companion__image-stack { animation: avatar-work-settle .9s cubic-bezier(.16,1,.3,1) both; }
 .avatar-companion[data-pose="work"] .avatar-companion__bubble-wrap { bottom: calc(100% + 8px); }
-.avatar-companion.is-paused .avatar-companion__image-stack,.avatar-companion.is-paused .avatar-companion__walk-cycle,.avatar-companion.is-paused .avatar-companion__dance-cycle,.avatar-companion.is-paused .avatar-companion__pushup-cycle { animation-play-state: paused; }
+.avatar-companion.is-paused .avatar-companion__image-stack,.avatar-companion.is-paused .avatar-companion__walk-cycle,.avatar-companion.is-paused .avatar-companion__pushup-cycle { animation-play-state: paused; }
 .avatar-companion[data-anchor="right"] .avatar-companion__bubble { right: 0; left: auto; }
 .avatar-companion[data-anchor="right"] .avatar-companion__bubble-wrap,.avatar-companion[data-anchor="right"] .avatar-companion__menu { right: 0; left: auto; }
 .avatar-companion[data-anchor="right"] .avatar-companion__bubble::after { right: 21px; left: auto; }
@@ -318,7 +315,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 @keyframes blink-soft { to { opacity: .62; } }
 @keyframes avatar-step { 0%,100% { transform: translateY(0) rotate(-.4deg); } 50% { transform: translateY(-3px) rotate(.4deg); } }
 @keyframes avatar-walk-cycle { 0%,24.99% { background-position: 0 0; } 25%,49.99% { background-position: 100% 0; } 50%,74.99% { background-position: 0 100%; } 75%,99.99% { background-position: 100% 100%; } 100% { background-position: 0 0; } }
-@keyframes avatar-dance-cycle { 0%,24.99% { background-position: 0 0; } 25%,49.99% { background-position: 100% 0; } 50%,74.99% { background-position: 0 100%; } 75%,99.99% { background-position: 100% 100%; } 100% { background-position: 0 0; } }
 @keyframes avatar-pushup-cycle { 0%,24.99% { background-position: 0 0; } 25%,49.99% { background-position: 100% 0; } 50%,74.99% { background-position: 0 100%; } 75%,99.99% { background-position: 100% 100%; } 100% { background-position: 0 0; } }
 @keyframes phone-rattle { from { transform: rotate(-11deg) scale(.94); } to { transform: rotate(11deg) scale(1.04); } }
 @keyframes avatar-reach-phone { from { transform: translateY(0) rotate(-.5deg); } to { transform: translateY(3px) rotate(.5deg); } }

@@ -88,7 +88,7 @@
                 <h2>Built for the<br><em>next move.</em></h2>
             </div>
             <div class="section-heading__aside">
-                <p>A cross-section of brand experiences, business systems and product ideas. Each one starts with a real problem worth making simpler.</p>
+                <p>A selection of brand experiences and business systems. Each one starts with a real problem worth making simpler.</p>
                 <span class="section-heading__scribble" aria-hidden="true">↘</span>
             </div>
         </div>
@@ -97,7 +97,6 @@
                 <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Everything <span>{{ count($portfolio['projects']) }}</span></button>
                 <button class="filter-button" type="button" data-filter="brand" aria-pressed="false">Brand / digital</button>
                 <button class="filter-button" type="button" data-filter="systems" aria-pressed="false">Business systems</button>
-                <button class="filter-button" type="button" data-filter="products" aria-pressed="false">Products / AI</button>
             </div>
             <p class="filter-status" id="filter-status" aria-live="polite">A few things made with purpose</p>
         </div>
@@ -170,12 +169,12 @@
         <div class="brief-panel" data-reveal>
             <div class="brief-panel__label">Pick the pressure point <span>01 — 04</span></div>
             <div class="brief-options" role="group" aria-label="Choose a business challenge">
-                <button type="button" class="brief-option is-active" data-brief-option aria-pressed="true" data-response="A sharper position and a consistent story can make every marketing and customer touchpoint work harder." data-project="{{ route('projects.show', 'safety-mart-online') }}"><span>01</span>My brand needs more clarity<i aria-hidden="true">↗</i></button>
+                <button type="button" class="brief-option is-active" data-brief-option aria-pressed="true" data-response="A sharper position and a consistent story can make every marketing and customer touchpoint work harder." data-project="{{ route('projects.show', 'arabian-dreams-tours') }}"><span>01</span>My brand needs more clarity<i aria-hidden="true">↗</i></button>
                 <button type="button" class="brief-option" data-brief-option aria-pressed="false" data-response="Start by mapping what customers need to do, where they get stuck and what a useful digital path should make easier." data-project="{{ route('projects.show', 'arabian-dreams-tours') }}"><span>02</span>I want to improve a website<i aria-hidden="true">↗</i></button>
                 <button type="button" class="brief-option" data-brief-option aria-pressed="false" data-response="A good system connects the steps people already take, then removes avoidable repetition and confusion." data-project="{{ route('projects.show', 'powerbooks') }}"><span>03</span>Our operations feel disconnected<i aria-hidden="true">↗</i></button>
                 <button type="button" class="brief-option" data-brief-option aria-pressed="false" data-response="Begin with the task that takes time or creates friction. Then decide whether automation or AI can help in a way people can review." data-project="{{ route('projects.show', 'cleanflow') }}"><span>04</span>I am exploring AI or automation<i aria-hidden="true">↗</i></button>
             </div>
-            <div class="brief-answer"><span class="eyebrow">A possible first move</span><p id="brief-response" aria-live="polite">A sharper position and a consistent story can make every marketing and customer touchpoint work harder.</p><a class="text-link" id="brief-project-link" href="{{ route('projects.show', 'safety-mart-online') }}">See it in a project <span aria-hidden="true">→</span></a></div>
+            <div class="brief-answer"><span class="eyebrow">A possible first move</span><p id="brief-response" aria-live="polite">A sharper position and a consistent story can make every marketing and customer touchpoint work harder.</p><a class="text-link" id="brief-project-link" href="{{ route('projects.show', 'arabian-dreams-tours') }}">See it in a project <span aria-hidden="true">→</span></a></div>
         </div>
     </section>
 
